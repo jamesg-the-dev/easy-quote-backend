@@ -35,4 +35,43 @@ return [
         ],
     ],
 
+    'supabase' => [
+        /*
+        |--------------------------------------------------------------------------
+        | Supabase URL
+        |--------------------------------------------------------------------------
+        |
+        | The URL of your Supabase project. This is used to construct the JWKS
+        | endpoint and verify JWT issuer claims.
+        |
+        | Example: https://your-project.supabase.co
+        */
+        'url' => env('SUPABASE_URL'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Supabase Anon Key
+        |--------------------------------------------------------------------------
+        |
+        | The anonymous/public key for your Supabase project.
+        | This is safe to expose in client-side code.
+        |
+        | Note: We do NOT use this for authentication on the backend.
+        | Backend uses JWT verification with public keys from JWKS.
+        */
+        'anon_key' => env('SUPABASE_ANON_KEY'),
+
+        /*
+        |--------------------------------------------------------------------------
+        | Supabase Service Role Key
+        |--------------------------------------------------------------------------
+        |
+        | The service role key for your Supabase project.
+        | KEEP THIS SECRET - never expose in client-side code.
+        |
+        | Used for admin operations on Supabase (e.g., managing users).
+        */
+        'service_role_key' => env('SUPABASE_SERVICE_ROLE_KEY'),
+    ],
+
 ];

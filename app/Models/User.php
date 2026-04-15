@@ -2,20 +2,35 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password'])]
-#[Hidden(['password', 'remember_token'])]
-class User extends Authenticatable
+/**
+ * @property string $id
+ * @property string $supabase_user_id
+ * @property string $email
+ * @property string|null $full_name
+ * @property string|null $avatar_url
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ */
+#[Fillable(['supabase_user_id', 'email', 'full_name', 'avatar_url'])]
+class User extends Model
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, HasUuids, Notifiable;
+
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'users';
 
     /**
      * Get the attributes that should be cast.
@@ -25,8 +40,59 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            'created_at' => 'datetime',
+            'updated_at' => 'datetime',
         ];
+    }
+
+    /**
+     * Find a user by their Supabase user ID.
+     *
+     * @param string $supabaseUserId
+     * @return static|null
+     */
+    public static function findBySupabaseUserId(string $supabaseUserId): ?self
+    {
+        return static::where('supabase_user_id', $supabaseUserId)->first();
+    }
+
+    /**
+     * Find a user by their Supabase user ID or create a new instance.
+     *
+     * @param string $supabaseUserId
+     * @return static
+     */
+    public static function findOrNewBySupabaseUserId(string $supabaseUserId): self
+    {
+        return static::where('supabase_user_id', $supabaseUserId)->first() ?? new static();
+    }
+
+    /**
+     * Get the user's full name, or email as fallback.
+     *
+     * @return Attribute
+     */
+    protected function displayName(): Attribute
+    {
+        return Attribute::make(
+            get: fn () => $this->full_name ?? $this->email,
+        );
+    }
+
+    /**
+     * Check if user is an admin.
+     *
+     * This is a placeholder. In production, you might:
+     * - Store role in database
+     * - Check Supabase custom claims
+     * - Use a separate roles table
+     *
+     * @return bool
+     */
+    public function isAdmin(): bool
+    {
+        // TODO: Implement admin check
+        // Example: return $this->role === 'admin';
+        return false;
     }
 }
