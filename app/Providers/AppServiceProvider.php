@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Policies\UserPolicy;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -30,8 +31,6 @@ class AppServiceProvider extends ServiceProvider
      */
     protected function registerPolicies(): void
     {
-        // Bind User model to UserPolicy
-        // This allows use of $this->authorize() in controllers
-        \Illuminate\Support\Facades\Gate::policy(User::class, UserPolicy::class);
+        Gate::policy(User::class, UserPolicy::class);
     }
 }

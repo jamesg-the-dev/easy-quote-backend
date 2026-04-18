@@ -13,33 +13,18 @@ use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 /**
  * Middleware for Supabase JWT authentication.
- *
- * Responsibilities:
- * - Extract JWT from Authorization header (Bearer token)
- * - Verify JWT signature and claims using Supabase JWKS
- * - Sync user from Supabase token data
- * - Make authenticated user available via request->user()
- * - Return 401 for invalid/expired tokens
- *
- * Usage in routes:
- *   Route::middleware('auth:supabase')->group(function () {
- *       Route::get('/user', [UserController::class, 'show']);
- *   });
  */
 class SupabaseAuthMiddleware
 {
     public function __construct(
         protected SupabaseJwtService $jwtService,
         protected UserSyncService $userSyncService,
-    ) {
-    }
+    ) {}
 
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param Closure(Request): SymfonyResponse $next
-     * @return SymfonyResponse
+     * @param  Closure(Request): SymfonyResponse  $next
      */
     public function handle(Request $request, Closure $next): SymfonyResponse
     {
@@ -47,7 +32,7 @@ class SupabaseAuthMiddleware
             // Extract token from Authorization header
             $token = $this->extractBearerToken($request);
 
-            if (!$token) {
+            if (! $token) {
                 return $this->unauthorizedResponse('Missing or invalid Authorization header');
             }
 
@@ -62,7 +47,8 @@ class SupabaseAuthMiddleware
 
             return $next($request);
         } catch (\Exception $e) {
-            Log::warning('Authentication failed: ' . $e->getMessage());
+            Log::warning('Authentication failed: '.$e->getMessage());
+
             return $this->unauthorizedResponse($e->getMessage());
         }
     }
@@ -70,7 +56,6 @@ class SupabaseAuthMiddleware
     /**
      * Extract Bearer token from Authorization header.
      *
-     * @param Request $request
      * @return string|null The token or null if not found
      */
     protected function extractBearerToken(Request $request): ?string
@@ -87,8 +72,7 @@ class SupabaseAuthMiddleware
     /**
      * Return 401 Unauthorized response.
      *
-     * @param string $message Error message
-     * @return Response
+     * @param  string  $message  Error message
      */
     protected function unauthorizedResponse(string $message = 'Unauthorized'): Response
     {

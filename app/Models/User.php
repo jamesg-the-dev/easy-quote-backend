@@ -12,14 +12,13 @@ use Illuminate\Notifications\Notifiable;
 
 /**
  * @property string $id
- * @property string $supabase_user_id
  * @property string $email
  * @property string|null $full_name
  * @property string|null $avatar_url
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  */
-#[Fillable(['supabase_user_id', 'email', 'full_name', 'avatar_url'])]
+#[Fillable(['id', 'email', 'full_name', 'avatar_url'])]
 class User extends Model
 {
     /** @use HasFactory<UserFactory> */
@@ -45,27 +44,6 @@ class User extends Model
         ];
     }
 
-    /**
-     * Find a user by their Supabase user ID.
-     *
-     * @param string $supabaseUserId
-     * @return static|null
-     */
-    public static function findBySupabaseUserId(string $supabaseUserId): ?self
-    {
-        return static::where('supabase_user_id', $supabaseUserId)->first();
-    }
-
-    /**
-     * Find a user by their Supabase user ID or create a new instance.
-     *
-     * @param string $supabaseUserId
-     * @return static
-     */
-    public static function findOrNewBySupabaseUserId(string $supabaseUserId): self
-    {
-        return static::where('supabase_user_id', $supabaseUserId)->first() ?? new static();
-    }
 
     /**
      * Get the user's full name, or email as fallback.

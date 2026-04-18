@@ -12,15 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('supabase_user_id')->unique()->index();
-            $table->string('email')->index();
-            $table->string('full_name');
-            $table->string('avatar_url')->nullable();
-            $table->timestamps();
+            $table->uuid('id')->primary(); // Supabase auth.users.id
 
-            // Add composite index for querying by email and supabase_user_id
-            $table->index(['supabase_user_id', 'email']);
+            $table->string('email')->unique()->index();
+            $table->string('full_name')->nullable();
+            $table->string('avatar_url')->nullable();
+
+            $table->timestamps();
         });
     }
 

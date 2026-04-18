@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Api\Controllers\AuthSyncController;
 use App\Http\Controllers\Api\UserController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -26,59 +27,11 @@ Route::get('/health', function () {
 
 // Authenticated routes (Supabase JWT required)
 Route::middleware('supabase.auth')->group(function () {
-    /*
-    |--------------------------------------------------------------------------
-    | User Routes
-    |--------------------------------------------------------------------------
-    */
-
-    // Get authenticated user's profile
     Route::get('/users/me', [UserController::class, 'me']);
 
     // Update authenticated user's profile
     Route::patch('/users/me', [UserController::class, 'updateProfile']);
 
-    // User CRUD operations (with authorization via policies)
-    Route::apiResource('users', UserController::class)->only(['index', 'show', 'destroy']);
+    Route::post('/auth/sync', [AuthSyncController::class, 'sync']);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Add more authenticated routes here
-    |--------------------------------------------------------------------------
-    |
-    | Example:
-    | Route::apiResource('quotes', QuoteController::class);
-    | Route::apiResource('projects', ProjectController::class);
-    | etc.
-    */
 });
-
-/*
-|--------------------------------------------------------------------------
-| Error Responses
-|--------------------------------------------------------------------------
-|
-| All endpoints return JSON responses:
-|
-| Success (200):
-|   {
-|     "data": { ... }
-|   }
-|
-| Unauthenticated (401):
-|   {
-|     "message": "Unauthorized",
-|     "error": "..."
-|   }
-|
-| Validation Error (422):
-|   {
-|     "message": "The given data was invalid.",
-|     "errors": { ... }
-|   }
-|
-| Server Error (500):
-|   {
-|     "message": "Server error"
-|   }
-*/
