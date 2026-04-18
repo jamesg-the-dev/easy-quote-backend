@@ -1,12 +1,37 @@
 <?php
 
-use Illuminate\Http\Request;
+use App\Http\Api\Controllers\AuthSyncController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\InvoiceController;
 
-Route::middleware('api')->group(function () {
-    // Quote API endpoints
-    Route::post('/quotes/{quoteNumber}/accept', [InvoiceController::class, 'accept']);
-    Route::post('/quotes/{quoteNumber}/request-changes', [InvoiceController::class, 'requestChanges']);
-    Route::post('/quotes/{quoteNumber}/decline', [InvoiceController::class, 'decline']);
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| These routes are protected by the Supabase JWT authentication middleware.
+| All requests must include a valid JWT token in the Authorization header.
+|
+| Authorization Header Format:
+|   Authorization: Bearer {jwt_token_from_supabase}
+|
+*/
+
+// Public routes (no authentication required)
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now(),
+    ]);
+});
+
+// Authenticated routes (Supabase JWT required)
+Route::middleware('supabase.auth')->group(function () {
+    Route::get('/users/me', [UserController::class, 'me']);
+
+    // Update authenticated user's profile
+    Route::patch('/users/me', [UserController::class, 'updateProfile']);
+
+    Route::post('/auth/sync', [AuthSyncController::class, 'sync']);
+
 });
